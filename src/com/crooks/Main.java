@@ -10,6 +10,11 @@ import java.util.stream.Collectors;
 public class Main {
 
     static final int SIZE = 10;
+    static boolean firstLoop = true;
+    static Random r = new Random();
+
+    static int startingX = r.nextInt(SIZE);
+    static int startingY = r.nextInt(SIZE);
 
     static Room[][] createRooms(){
         Room[][] rooms = new Room[SIZE][SIZE];
@@ -28,7 +33,6 @@ public class Main {
         if (row > 0) {
             neighbors.add(rooms[row-1][col]);
         }
-
        //get bottom room
         if (row < SIZE-1){
             neighbors.add(rooms[row+1][col]);
@@ -37,7 +41,6 @@ public class Main {
         if (col >0) {
             neighbors.add(rooms[row][col-1]);
         }
-
         //get right room
         if (col <SIZE-1){
             neighbors.add(rooms[row][col+1]);
@@ -81,11 +84,16 @@ public class Main {
     static boolean createMaze( Room[][] rooms, Room currentRoom){
         currentRoom.wasVisited = true;
         Room nextRoom = randomNeighbor(rooms,currentRoom.row,currentRoom.col);
+
         if(nextRoom==null){
             return false;
         }
         tearDownWall(currentRoom, nextRoom);
         while (createMaze(rooms,nextRoom)) {
+        }
+        if(firstLoop == false){
+            rooms[startingX][startingY].setIsStart(true);
+            firstLoop = true;
         }
         return true;
     }
@@ -93,7 +101,11 @@ public class Main {
 
     public static void main(String[] args) {
         Room[][] rooms = createRooms();
-        createMaze(rooms, rooms[0][0]);
+
+        System.out.println(startingX + ":" + startingY);
+        rooms[startingX][startingY].setIsStart(true);
+
+        createMaze(rooms, rooms[startingX][startingY]);
 
         for (Room[] row : rooms){  //creates the cap on top of the grid
             System.out.print(" _");
@@ -102,9 +114,16 @@ public class Main {
 
         for (Room[] row: rooms) {
             System.out.print("|"); // adds the starting pipe on the left hand side
-            for (Room room : row){ // loops through and adds bottom right for each index position
-                System.out.print(room.hasBottom ? "_" : " ");  //inline conditional - if the room has a bottom print one otherwise print a space
-                System.out.print(room.hasRight ? "|" : " ");  //same as above but for pipes
+            for (Room room : row) { // loops through and adds bottom right for each index position
+                //same as above but for pipes
+                if (room.isStart) {
+                    System.out.print(room.isStart ? "O" : "");
+                    System.out.print(room.hasRight ? "|" : " ");
+                } else {
+                    System.out.print(room.hasBottom ? "_" : " ");  //inline conditional - if the room has a bottom print one otherwise print a space
+                    System.out.print(room.hasRight ? "|" : " ");
+
+                }
             }
             System.out.println();
         }
