@@ -11,6 +11,7 @@ public class Main {
 
     static final int SIZE = 10;
     static boolean firstLoop = true;
+    static boolean firstStop = true;
     static Random r = new Random();
 
     static int startingX = r.nextInt(SIZE);
@@ -52,14 +53,19 @@ public class Main {
 
         return neighbors;
     }
-    static Room randomNeighbor(Room[][] rooms, int row, int col){
+    static Room randomNeighbor(Room[][] rooms, int row, int col) {
         ArrayList<Room> neighbors = possibleNeighbors(rooms, row, col);
-        if(neighbors.size() > 0){
+        if (neighbors.size() > 0) {
             Random r = new Random();
             int index = r.nextInt(neighbors.size());
             return neighbors.get(index);
+        } else {
+            if (firstStop == true){
+                rooms[row][col].setIsEnd(true);
+                firstStop = false;
+            }
+            return null;
         }
-        return null;
     }
 
     static void tearDownWall(Room oldRoom, Room newRoom){
@@ -102,7 +108,8 @@ public class Main {
     public static void main(String[] args) {
         Room[][] rooms = createRooms();
 
-        System.out.println(startingX + ":" + startingY);
+        System.out.println("Starting index positions: " + startingX + ":" + startingY);
+        System.out.println("The starting and ending position lack Underscores.");
         rooms[startingX][startingY].setIsStart(true);
 
         createMaze(rooms, rooms[startingX][startingY]);
@@ -119,6 +126,10 @@ public class Main {
                 if (room.isStart) {
                     System.out.print(room.isStart ? "O" : "");
                     System.out.print(room.hasRight ? "|" : " ");
+                } else if (room.isEnd) {
+                    System.out.print(room.isEnd ? "X" : "");
+                    System.out.print(room.hasRight ? "|" : " ");
+
                 } else {
                     System.out.print(room.hasBottom ? "_" : " ");  //inline conditional - if the room has a bottom print one otherwise print a space
                     System.out.print(room.hasRight ? "|" : " ");

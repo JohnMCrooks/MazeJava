@@ -12,6 +12,7 @@ public class Room {
     boolean hasBottom = true;
     boolean hasRight = true;
     boolean isStart = false;
+    boolean isEnd = false;
 
     public Room(int row, int col) {
         this.row = row;
@@ -40,5 +41,13 @@ public class Room {
 
     public void setIsStart(boolean start) {
         isStart = start;
+    }
+
+    public boolean isEnd() {
+        return isEnd;
+    }
+
+    public void setIsEnd(boolean end) {
+        isEnd = end;
     }
 }
