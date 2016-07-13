@@ -1,6 +1,8 @@
 package com.crooks;
 
 import java.util.ArrayList;
+import java.util.Random;
+import java.util.stream.Collectors;
 
 /**
  * Created by johncrooks on 7/13/16.
@@ -19,8 +21,79 @@ public class Main {
         return rooms;
     }
 
+    static ArrayList<Room> possibleNeighbors(Room[][] rooms, int row, int col){
+        ArrayList<Room> neighbors = new ArrayList<>();
+
+       //getting top room
+        if (row > 0) {
+            neighbors.add(rooms[row-1][col]);
+        }
+
+       //get bottom room
+        if (row < SIZE-1){
+            neighbors.add(rooms[row+1][col]);
+        }
+        //get left room
+        if (col >0) {
+            neighbors.add(rooms[row][col-1]);
+        }
+
+        //get right room
+        if (col <SIZE-1){
+            neighbors.add(rooms[row][col+1]);
+        }
+
+        neighbors = neighbors.stream()
+                .filter(room -> !room.wasVisited)
+                .collect(Collectors.toCollection(ArrayList<Room>::new));
+
+        return neighbors;
+    }
+    static Room randomNeighbor(Room[][] rooms, int row, int col){
+        ArrayList<Room> neighbors = possibleNeighbors(rooms, row, col);
+        if(neighbors.size() > 0){
+            Random r = new Random();
+            int index = r.nextInt(neighbors.size());
+            return neighbors.get(index);
+        }
+        return null;
+    }
+
+    static void tearDownWall(Room oldRoom, Room newRoom){
+        // going up
+        if (newRoom.row < oldRoom.row) {
+            newRoom.hasBottom = false;
+        }
+        //going down
+        else if (newRoom.row >oldRoom.row){
+            oldRoom.hasBottom = false;
+        }
+        //going left
+        else if (newRoom.col < oldRoom.col) {
+            newRoom.hasRight=false;
+        }
+        //going right
+        else if ( newRoom.col > oldRoom.col){
+            oldRoom.hasRight = false;
+        }
+    }
+
+    static boolean createMaze( Room[][] rooms, Room currentRoom){
+        currentRoom.wasVisited = true;
+        Room nextRoom = randomNeighbor(rooms,currentRoom.row,currentRoom.col);
+        if(nextRoom==null){
+            return false;
+        }
+        tearDownWall(currentRoom, nextRoom);
+        while (createMaze(rooms,nextRoom)) {
+        }
+        return true;
+    }
+
+
     public static void main(String[] args) {
         Room[][] rooms = createRooms();
+        createMaze(rooms, rooms[0][0]);
 
         for (Room[] row : rooms){  //creates the cap on top of the grid
             System.out.print(" _");
@@ -30,7 +103,8 @@ public class Main {
         for (Room[] row: rooms) {
             System.out.print("|"); // adds the starting pipe on the left hand side
             for (Room room : row){ // loops through and adds bottom right for each index position
-                System.out.print("_|");
+                System.out.print(room.hasBottom ? "_" : " ");  //inline conditional - if the room has a bottom print one otherwise print a space
+                System.out.print(room.hasRight ? "|" : " ");  //same as above but for pipes
             }
             System.out.println();
         }
