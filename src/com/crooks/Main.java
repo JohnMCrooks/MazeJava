@@ -121,8 +121,7 @@ public class Main {
 
         for (Room[] row: rooms) {
             System.out.print("|"); // adds the starting pipe on the left hand side
-            for (Room room : row) { // loops through and adds bottom right for each index position
-                //same as above but for pipes
+            for (Room room : row) { // loops through and adds bottoms and Pipes for each index position
                 if (room.isStart) {
                     System.out.print(room.isStart ? "O" : "");
                     System.out.print(room.hasRight ? "|" : " ");
